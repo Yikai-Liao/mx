@@ -5,6 +5,7 @@
 #pragma once
 
 #include <limits>
+#include <cstdint>
 #include <functional>
 #include <iostream>
 #include <string>
