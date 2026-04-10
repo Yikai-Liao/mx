@@ -266,9 +266,50 @@ namespace mx
 
             for( const auto& tempo : myDirectionData.tempos )
             {
-                if( tempo.tempoType != api::TempoType::beatsPerMinute )
+                const api::BeatsPerMinute* beatUnitData = nullptr;
+                std::string perMinuteText;
+
+                switch( tempo.tempoType )
                 {
-                    MX_THROW( "Only api::TempoType::beatsPerMinute is supported, others are not implemented" );
+                    case api::TempoType::beatsPerMinute:
+                    {
+                        beatUnitData = &tempo.beatsPerMinute;
+                        if( beatUnitData->beatsPerMinute < 0 )
+                        {
+                            MX_THROW( "api::TempoType::beatsPerMinute requires beatsPerMinute >= 0" );
+                        }
+                        perMinuteText = std::to_string( beatUnitData->beatsPerMinute );
+                        break;
+                    }
+
+                    case api::TempoType::tempoText:
+                    {
+                        if( tempo.tempoText.tempoText.empty() )
+                        {
+                            MX_THROW( "api::TempoType::tempoText requires tempoText.tempoText" );
+                        }
+
+                        beatUnitData
+                            = tempo.tempoText.playbackBeatsPerMinute.durationName
+                                      != api::DurationName::unspecified ?
+                                  &tempo.tempoText.playbackBeatsPerMinute :
+                                  &tempo.beatsPerMinute;
+                        perMinuteText = tempo.tempoText.tempoText;
+                        break;
+                    }
+
+                    default:
+                    {
+                        MX_THROW(
+                            "Only api::TempoType::beatsPerMinute and api::TempoType::tempoText are supported"
+                        );
+                    }
+                }
+
+                if( beatUnitData == nullptr
+                    || beatUnitData->durationName == api::DurationName::unspecified )
+                {
+                    MX_THROW( "Tempo export requires a concrete beat-unit duration" );
                 }
                 
                 auto outDirType = core::makeDirectionType();
@@ -281,9 +322,9 @@ namespace mx
                 auto beatUnitGroup = bpm->getBeatUnitGroup();
                 auto beatUnit = beatUnitGroup->getBeatUnit();
                 Converter converter;
-                beatUnit->setValue(converter.convert(tempo.beatsPerMinute.durationName));
+                beatUnit->setValue( converter.convert( beatUnitData->durationName ) );
                 
-                for( int d = 0; d < tempo.beatsPerMinute.dots; ++d )
+                for( int d = 0; d < beatUnitData->dots; ++d )
                 {
                     beatUnitGroup->addBeatUnitDot(core::makeBeatUnitDot());
                 }
@@ -291,8 +332,7 @@ namespace mx
                 auto pmobuc = bpm->getPerMinuteOrBeatUnitChoice();
                 pmobuc->setChoice( core::PerMinuteOrBeatUnitChoice::Choice::perMinute );
                 auto pm = pmobuc->getPerMinute();
-                auto str = std::to_string( tempo.beatsPerMinute.beatsPerMinute );
-                pm->setValue( core::XsString{ str } );
+                pm->setValue( core::XsString{ perMinuteText } );
                 //auto& attr = *outElement->getAttributes();
                 //setAttributesFromSpannerStart( item, attr );
             }

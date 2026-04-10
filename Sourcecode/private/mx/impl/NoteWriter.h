@@ -59,6 +59,8 @@ namespace mx
             void setDurationNameAndDots() const;
             void setNotehead() const;
             void setStemDirection() const;
+            void setDynamics() const;
+            void setLyrics() const;
             void setMiscData() const;
             bool findNormalNameAndDots( mx::api::DurationName& ioName, int& ioDots, long double inTickLength ) const;
         };

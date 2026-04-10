@@ -19,6 +19,7 @@ namespace mx
         };
         
         MXAPI_EQUALS_BEGIN( LyricData )
+        MXAPI_EQUALS_MEMBER( text )
         MXAPI_EQUALS_END;
         MXAPI_NOT_EQUALS_AND_VECTORS( LyricData );
     }

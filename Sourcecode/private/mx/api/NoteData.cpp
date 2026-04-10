@@ -26,6 +26,9 @@ namespace mx
         , beams{}
         , positionData{}
         , printData{}
+        , dynamics{ 0.0 }
+        , isDynamicsSpecified{ false }
+        , lyrics{}
         , noteAttachmentData{}
         {
             

@@ -7,6 +7,7 @@
 #include "mx/api/PrintData.h"
 #include "mx/api/PositionData.h"
 #include "mx/api/DurationData.h"
+#include "mx/api/LyricData.h"
 #include "mx/api/PitchData.h"
 #include "mx/api/NoteAttachmentData.h"
 
@@ -115,6 +116,9 @@ namespace mx
             std::vector<Beam> beams;
             PositionData positionData;
             PrintData printData;
+            long double dynamics;
+            bool isDynamicsSpecified;
+            std::vector<LyricData> lyrics;
             
             NoteAttachmentData noteAttachmentData;
 
@@ -146,6 +150,9 @@ namespace mx
         MXAPI_EQUALS_MEMBER( beams )
         MXAPI_EQUALS_MEMBER( positionData )
         MXAPI_EQUALS_MEMBER( printData )
+        MXAPI_EQUALS_MEMBER( dynamics )
+        MXAPI_EQUALS_MEMBER( isDynamicsSpecified )
+        MXAPI_EQUALS_MEMBER( lyrics )
         MXAPI_EQUALS_MEMBER( noteAttachmentData )
         MXAPI_EQUALS_MEMBER( miscData )
         MXAPI_EQUALS_END;

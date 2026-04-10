@@ -20,6 +20,8 @@
 #include "mx/core/elements/FullNoteTypeChoice.h"
 #include "mx/core/elements/GraceNoteGroup.h"
 #include "mx/core/elements/GraceNoteGroup.h"
+#include "mx/core/elements/Lyric.h"
+#include "mx/core/elements/LyricTextChoice.h"
 #include "mx/core/elements/NormalDot.h"
 #include "mx/core/elements/NormalNoteGroup.h"
 #include "mx/core/elements/NormalNoteGroup.h"
@@ -38,6 +40,8 @@
 #include "mx/core/elements/Staff.h"
 #include "mx/core/elements/Stem.h"
 #include "mx/core/elements/Step.h"
+#include "mx/core/elements/SyllabicTextGroup.h"
+#include "mx/core/elements/Text.h"
 #include "mx/core/elements/Tie.h"
 #include "mx/core/elements/Tied.h"
 #include "mx/core/elements/TimeModification.h"
@@ -84,6 +88,8 @@ namespace mx
             setDurationNameAndDots();
             setNotehead();
             setStemDirection();
+            setDynamics();
+            setLyrics();
             setMiscData();
             NotationsWriter notationsWriter{ myNoteData, myCursor, myScoreWriter };
             auto& noteAttr = *myOutNote->getAttributes();
@@ -400,7 +406,8 @@ namespace mx
         
         void NoteWriter::setDurationNameAndDots() const
         {
-            if( !myNoteData.isRest || !myNoteData.isMeasureRest )
+            if( ( !myNoteData.isRest || !myNoteData.isMeasureRest )
+                && myNoteData.durationData.durationName != api::DurationName::unspecified )
             {
                 myOutNote->setHasType( true );
                 myOutNote->getType()->setValue( myConverter.convert( myNoteData.durationData.durationName ) );
@@ -430,6 +437,32 @@ namespace mx
             
             myOutNote->setHasStem( true );
             myOutNote->getStem()->setValue( myConverter.convert( myNoteData.stem ) );
+        }
+
+
+        void NoteWriter::setDynamics() const
+        {
+            if( !myNoteData.isDynamicsSpecified )
+            {
+                return;
+            }
+
+            auto& noteAttr = *myOutNote->getAttributes();
+            noteAttr.hasDynamics = true;
+            noteAttr.dynamics = core::NonNegativeDecimal{ myNoteData.dynamics };
+        }
+
+
+        void NoteWriter::setLyrics() const
+        {
+            for( const auto& lyricData : myNoteData.lyrics )
+            {
+                auto lyric = core::makeLyric();
+                auto choice = lyric->getLyricTextChoice();
+                choice->setChoice( core::LyricTextChoice::Choice::syllabicTextGroup );
+                choice->getSyllabicTextGroup()->getText()->setValue( core::XsString{ lyricData.text } );
+                myOutNote->addLyric( lyric );
+            }
         }
 
 

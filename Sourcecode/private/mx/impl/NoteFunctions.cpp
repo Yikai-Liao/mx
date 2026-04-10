@@ -171,8 +171,15 @@ namespace mx
                 myOutNoteData.durationData.timeModificationNormalTypeDots = 0;
             }
             parseNotations();
-            myOutNoteData.positionData = impl::getPositionData( *myNote.getAttributes() );
-            myOutNoteData.printData = impl::getPrintData( *myNote.getAttributes() );
+            const auto& incomingNoteAttributes = *( myNote.getAttributes() );
+            myOutNoteData.positionData = impl::getPositionData( incomingNoteAttributes );
+            myOutNoteData.printData = impl::getPrintData( incomingNoteAttributes );
+            if( incomingNoteAttributes.hasDynamics )
+            {
+                myOutNoteData.isDynamicsSpecified = true;
+                myOutNoteData.dynamics = incomingNoteAttributes.dynamics.getValue();
+            }
+            myOutNoteData.lyrics = reader.getLyrics();
             
             if( reader.getIsStemSpecified() )
             {
@@ -182,7 +189,6 @@ namespace mx
             myOutNoteData.isTieStop = reader.getIsTieStop();
 
             parseMiscData();
-            const auto& incomingNoteAttributes = *(myNote.getAttributes());
             myOutNoteData.positionData = impl::getPositionData( incomingNoteAttributes );
 
             return myOutNoteData;

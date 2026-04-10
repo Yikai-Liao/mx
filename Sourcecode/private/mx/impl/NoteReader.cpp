@@ -437,9 +437,9 @@ namespace mx
                                 const auto& textPtr = textGroup->getText();
                                 if ( textPtr )
                                 {
-                                    const auto text = textPtr->getValue();
-                                    const LyricType lyricType( text.getValue(), syllabic );
-                                    myLyrics.emplace_back( lyricType );
+                                    auto lyricData = api::LyricData{};
+                                    lyricData.text = textPtr->getValue().getValue();
+                                    myLyrics.emplace_back( std::move( lyricData ) );
                                     myHasLyric = true;
                                 }
                             }
